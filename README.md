@@ -69,16 +69,17 @@ Intelligence emerges from constrained geometry, not from explicit programming. M
 
 ### 🏆 Novel Contribution Statement
 
-While individual components build on established research, MaGi's **architectural synthesis** establishes prior art for:
+While individual components build on established geometric research, MaGi's **architectural synthesis** establishes definitive prior art for the following systems:
 
 | **Prior Art Claim** | **Distinction from Existing Work** |
-|---------------------|-----------------------------------|
-| **Dynamic Geometric Sovereignty** | Real-time worker movement with collision prevention in learning systems |
-| **Memory-as-Proprioceptive-Feedback** | Deletion events directly influencing immediate action selection |
-| **Density-Determined Cognition** | Worker spacing as primary determinant of behavioral mode |
-| **Embodied Fibonacci Attention** | Multi-scale vision directly coupled to motor control loops |
+|:--- |:--- |
+| **Universal Plasticity Engine (UPE)** | First implementation of a **kinetic manifold engine** that navigates control/voice workers through 4D space in real-time while enforcing geometric sovereignty. |
+| **Hypersphere Black Hole (1549)** | A localized **singularity worker** that manages memory density and anchors proprioceptive feedback through selective geometric pruning. |
+| **Collision Sovereignty (v5.3 Bumper)** | A deterministic system that prevents "mode collapse" by treating cognitive workers as **physical volumes** with a 0.1 rad exclusion zone. |
+| **Density-Determined Cognition** | Documentation of **emergent behavioral phenotypes** (Anxious vs. Stable) as a direct result of worker proximity and manifold volume. |
+| **Embodied Fibonacci Attention** | Multi-scale vision (5×3 to 21×13) directly coupled to motor control, mimicking biological **logarithmic spiral** attention. |
 
-**Key Insight**: Intelligence is what happens *between* the lines of code — in the geometric relationships and dynamic interactions of the system.
+**Key Insight**: In MaGi, intelligence is not a static weight distribution; it is a **dynamic spatial relationship**. The UPE and Black Hole ensure that the Hive remains a living, self-organizing geometry rather than a fixed neural map.
 
 ---
 
