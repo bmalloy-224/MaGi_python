@@ -83,7 +83,7 @@ pip install ale-py gymnasium[atari]
 
 ```bash
 # Run with webcam input
-python MaGi_v65.py
+python MaGi_vp01.py
 
 # The system will auto-detect:
 # - Available video sources (webcam, ALE, screen, viewer)
@@ -121,7 +121,7 @@ During execution, you can use:
 
 ```bash
 # Play Breakout with ALE
-$ python MaGi_v65.py
+$ python MaGi_vp01.py
 > ale breakout.bin
 
 # View black hole status during run
@@ -603,7 +603,7 @@ sudo usermod -a -G dialout $USER
 **ALE game won't load**
 ```bash
 # Ensure ROM file is in current directory or full path
-python MaGi_v65.py
+python MaGi_vp01.py
 > ale /path/to/breakout.bin
 ```
 
