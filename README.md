@@ -1,7 +1,7 @@
 # 🌀 MaGi_python — Malloy artificial Geometric Intelligence
 
 **Hardware-Embodied Systems using python**  
-Hardware-Embodied Systems using Python > Exploring how  curve-based operators produce emergent cognition. Uses fibonacci-scale visual attention, 4D hypersphere, hypersphere black hole memory management, and a hypersphere worker movement (UPE).
+ > Exploring how  curve-based operators produce emergent cognition. Uses fibonacci-scale visual attention, 4D hypersphere, hypersphere black hole memory management, and a hypersphere worker movement (UPE).
 
 [![License](https://img.shields.io/badge/License-GPL--3.0%20%2B%20Commercial-blue.svg)](https://github.com/bmalloy-224/MaGi_python/blob/main/LICENSE)
 [![Research](https://img.shields.io/badge/Research-Geometric%20Intelligence-green.svg)](https://github.com/bmalloy-224/MaGi_python)
