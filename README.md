@@ -97,11 +97,11 @@ MaGi_python supports multiple operational modes and commands:
 
 ### Mode Selection
 Type these commands at startup when prompted:
-- **`webcam`** - Use webcam as video source
-- **`ale <game>.bin`** - Load Atari game (e.g., `ale breakout.bin`, `ale pong.bin`)
-- **`screen`** - Capture and process screen content
-- **`viewer`** - Neural-controlled image viewer
-- **`voice`** - Use 'voice <enable/disable> <ale,webcam,screen>
+- **`webcam`** - Use webcam as video source. Use "mode webcam".
+- **`ale <game>.bin`** - Load Atari game (e.g., `ale breakout.bin`, `ale pong.bin`) Use "mode ale <game>.bin".
+- **`screen`** - Capture and process screen content. Use "mode screen".
+- **`viewer`** - Neural-controlled image viewer. Use "mode viewer". Expects images in an "images" subfolder.
+- **`voice`** - Use 'voice <enable/disable> <ale,webcam,screen>. Use example: "voice enable ale".
 
 ### Runtime Commands (One-Screen Only)
 During execution, you can use:
