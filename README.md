@@ -115,7 +115,7 @@ During execution, you can use:
   - **Bumper feedback** (sensory awareness of singularity edge)
   - **Memory structure quality** (cosine similarity clustering metrics)
 - **`UPE`** - Universal Plasticity Engine information:
--   Shows the current workers and the amount of movement.
+  - Shows the current workers and the % amount of movement.
 
 ### Example Sessions
 
