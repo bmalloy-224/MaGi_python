@@ -300,6 +300,12 @@ if control_value > 250:
 
 **Total**: 432 video workers
 
+**Architectural Advantages**:
+- **Geometric Independence**: Fibonacci ratios avoid shared factors, preventing resonant traps
+- **Stable Learning**: Zero hive drift (learned hypersphere positions preserved across grid changes)
+- **Resonance Prevention**: Eliminates visual harmonics and commensurate attractors
+- **Emergent Attention**: φ-convergence (≈1.618) creates natural hierarchical perception
+
 ---
 
 ## 📊 Worker Index Map
@@ -425,6 +431,19 @@ MIN_SEPARATION = 0.1        # v5.3 Geometric constraint (radians)
 | Analysis | CPU | 1-5 | Dense (0.10 rad) |
 
 ---
+
+### ⚠️ Resonance Hygiene
+
+When extending MaGi or modifying worker counts:
+
+* **Grid dimensions**: Stick to Fibonacci/prime sequences
+* **Timing intervals**: Avoid small common divisors (use primes)
+* **Memory radii**: Ensure non-alignment with phase spacing  
+* **Control thresholds**: Avoid symmetric boundaries
+
+*If behavior becomes "stuck" or "repetitive," inspect the geometry for **commensurate attractors** before modifying logic.*
+
+**Example**: The v5.3 bumper prevents workers from entering resonant orbits around the black hole.
 
 ## 🔬 Research Contributions
 
