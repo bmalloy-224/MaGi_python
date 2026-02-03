@@ -1,4 +1,4 @@
-```markdown
+
 # 🌀 MaGi_python — Malloy artificial Geometric intelligence
 
 **Hardware-Embodied Systems using python**  
