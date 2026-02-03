@@ -60,6 +60,22 @@ MaGi_python demonstrates that geometric intelligence expresses through:
 
 ---
 
+## 🧠 Governing Principle: Geometric Independence
+
+MaGi operates under a single architectural constraint:
+
+**Cognitive exploration is only stable when spatial, temporal, control, and memory partitions are geometrically independent.**
+
+Shared divisors, shared boundaries, or shared periods create **commensurate attractors** that collapse degrees of freedom. Fibonacci grids, prime timing, deadzone control, black hole memory deletion, and collision sovereignty all exist to prevent this resonance.
+
+| Component | Geometric Independence Mechanism |
+|-----------|----------------------------------|
+| **Fibonacci Grids** | Dimensions avoid shared factors |
+| **Prime Timing** | Intervals avoid small common divisors |
+| **Black Hole Memory** | Removes overrepresented trajectories |
+| **Collision Sovereignty** | Enforces minimum separation |
+| **UPE Movement** | Preserves distinct worker identities |
+
 ## 🔬 Research Basis & Emergent Properties
 
 MaGi implements **minimal geometric rules** that produce **complex emergent cognition**:
@@ -232,6 +248,11 @@ def enforce_collision_sovereignty(workers):
 - **Radius**: `effective_radius = base_radius * (1 + tanh(value/500))`
 - **Proprioceptive Feedback**: Deletion events influence system state
 - **Emergent Structure**: Deletion produces tighter cosine similarity clustering
+
+**Cognitive Entropy Preservation**: 
+The black hole does not implement simple forgetting. 
+It removes overrepresented trajectories to preserve global state-space entropy,
+preventing **memory resonance** in the same way Fibonacci grids prevent visual resonance.
 
 ```python
 similarity = torch.nn.functional.cosine_similarity(memory_vector, current_state)
