@@ -120,18 +120,21 @@ MaGi_python supports multiple operational modes and commands:
 ### Mode Selection
 Type these commands at runtime:
 - `mode webcam` - Use local webcam as video source
-- `mode robot lowrez` - Robot camera: 640×480 @ 120 FPS, H.264
-- `mode robot highrez` - Robot camera: 1920×1440 @ 30 FPS, H.265
-- `mode robot` - Default to lowrez mode
+- `mode robot lowrez` - Robot camera: 640×480 @ 120 FPS, H.264 (coming soon)
+- `mode robot highrez` - Robot camera: 1920×1440 @ 30 FPS, H.265 (coming soon)
+- `mode robot` - Default to lowrez mode (coming soon)
 - `mode ale <game>.bin` - Load Atari game (e.g., `mode ale breakout.bin`)
 - `mode screen` - Capture screen content
 - `mode viewer` - Neural-controlled image viewer (expects `images/` subfolder)
 
 ### Audio Control
-- `mic local` - PC microphone (pyaudio)
-- `mic robot` - Pi microphone (UDP 5004)
-- `mic both` - Mix local + robot (pressure superposition)
-- `mic off` - Silence input
+- `mic local` - PC microphone (pyaudio) (coming soon)
+- `mic robot` - Pi microphone (UDP 5004) (coming soon)
+- `mic both` - Mix local + robot (pressure superposition) (coming soon)
+- `mic off` - Silence input (coming soon)
+
+### Voice Control
+- `voice <enable/disable> <mode>` - Can enable or disable voice for ale, webcam, screen, and viewer.
 
 ### Runtime Commands
 During execution:
