@@ -103,7 +103,7 @@ Type these commands at startup when prompted:
 - **`ale <game>.bin`** - Load Atari game (e.g., `ale breakout.bin`, `ale pong.bin`)
 - **`screen`** - Capture and process screen content
 - **`viewer`** - Neural-controlled image viewer
-- **`grabber`** - Advanced screen capture with overlay
+- **`voice`** - Use 'voice <enable/disable> <ale,webcam,screen>
 
 ### Runtime Commands (One-Screen Only)
 During execution, you can use:
@@ -116,6 +116,8 @@ During execution, you can use:
   - Black hole value and position in hypersphere
   - **Bumper feedback** (sensory awareness of singularity edge)
   - **Memory structure quality** (cosine similarity clustering metrics)
+- **`UPE`** - Universal Plasticity Engine information:
+-   Shows the current workers and the amount of movement.
 
 ### Example Sessions
 
