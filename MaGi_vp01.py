@@ -1,35 +1,67 @@
-# ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║     MaGi v67 - MEMORY-SAFE FIBONACCI GRIDS (ALE/BH Positions Preserved)    ║
-# ║    Webcam + ALE + Screen + Grabber | Value Control | Telemetry | Visuals     ║
-# ╚══════════════════════════════════════════════════════════════════════════════╝
 
-# ARCHITECTURAL STATE:
-# ✅ CONTROL: Direct Oscillator Value (>250 triggers action, not coherence)
-# ✅ VIDEO SCALES: Large Fibonacci grids (5×3, 8×5, 13×8, 21×13)
-# ✅ MEMORY PRESERVATION: ALE (1542-1547), Voice (1548), BH (1549) UNCHANGED
-# ✅ RESONANCE FIX: No common divisors, golden ratio progression
-# ✅ COMMUNICATION: 432 video workers (38% MORE boxes for MaGi)
-# ✅ LOGGING: Complete legacy CSV columns + new control columns
-# ✅ ALE: Full 18-action support with 6 base workers at ORIGINAL indices
-# ✅ VIEWER: Integrated image viewer with Neural Control
-# ✅ SCREEN: Integrated Tkinter transparent overlay for screen capture
+# MaGi_python (Malloy artificial Geometric intelligence)
+# ------------------------------------------------------
+# Author:  Brendan Malloy
+# Year:    2025-2026
+# Version: v67 (Memory-Safe Fibonacci Grids / Collision Sovereignty)
 
-# v67 MEMORY-SAFE CHANGES:
-# - Video scales moved to eat early audio space (516-947)
-# - Audio workers shifted later but count unchanged (948-1461)
-# - ALE workers UNCHANGED at 1542-1547 (UPE memories preserved!)
-# - Voice carrier UNCHANGED at 1548 (no relearning needed!)
-# - Black hole UNCHANGED at 1549 (tuning intact!)
-# - Lazy river UNCHANGED at 1550+ (flow continues!)
-# 
-# Video Grid Changes:
-# - Scale 0: 5×3 = 15 boxes (was 4×3 = 12) at 516-530
-# - Scale 1: 8×5 = 40 boxes (was 6×5 = 30) at 531-570
-# - Scale 2: 13×8 = 104 boxes (was 10×8 = 80) at 571-674
-# - Scale 3: 21×13 = 273 boxes (was 16×12 = 192) at 675-947
-# - All dimensions pure Fibonacci: 5,3,8,5,13,8,21,13
-# - Golden ratio progression: ratios converge to φ ≈ 1.618
-# - Zero hive drift: All learned worker positions preserved! 
+# Hardware-Embodied Geometric Intelligence Platform with Neural Control & Memory Systems.
+# Exploring the emergence of cognitive architecture through hardware wobble, 
+# prime-delay resonance, and hypersphere manifold dynamics.
+
+# Novel Technologies Claimed (Prior Art 2025-2026):
+# -------------------------------------------------
+# 1. Hypersphere Black Hole Memory Deletion Worker: 
+#    Geometric memory management using black hole physics principles for intelligent 
+#    memory pruning with sensory feedback anchoring. Deletion actively improves 
+#    memory structure through enhanced cosine similarity clustering.
+
+# 2. Universal Plasticity Engine (UPE): 
+#    Enables dynamic cognitive reconfiguration by allowing a black hole worker to 
+#    move control/voice workers within the hypersphere while maintaining collision sovereignty.
+
+# 3. Collision Sovereignty (v5.3 Bumper): 
+#    Deterministic geometric "bumper" preventing worker ghosting. Enforces a 
+#    minimum 0.1 radian separation to preserve action identity and prevent manifold collapse.
+
+# 4. Artificial Personal Space: 
+#    First documented implementation of non-overlapping cognitive workers in 
+#    hypersphere manifolds, preventing "dead neuron" phenomena through geometric volume constraints.
+
+# 5. Fibonacci Grid Video Processing: 
+#    Multi-scale visual attention using golden ratio proportions (5×3, 8×5, 13×8, 21×13).
+
+# 6. Neural Deadzone Control: 
+#    Unipolar and bipolar deadzone logic for stable AI-to-system control.
+
+
+# License & Usage Terms
+# ---------------------
+# 1. Academic & Non-Profit Use:
+#    - Licensed under a GPL-style open license for **academic and non-profit research** only.
+#    - You may use, modify, and distribute this software for **educational purposes**
+#      provided that this notice and attribution remain intact.
+
+# 2. Commercial Use & Licensing:
+#    - Commercial or for-profit use requires a **perpetual license** from the author.
+#    - Licensing tiers (USD):
+#        • Individual / Startup (< $10M annual revenue): $5,000
+#        • Mid-size Organization (< $100M annual revenue): $50,000
+#        • Large Organization / Enterprise (≥ $100M annual revenue): $500,000
+#    - Written permission is required before deployment or integration into closed systems.
+
+# 3. Disclaimer:
+#    - Software provided **"as is"**. Author assumes **no liability** for damages or data loss.
+#    - MaGi is **experimental research software**, not certified for safety-critical control.
+
+# 4. Citation / Attribution:
+#    - Any public use or publication must cite:
+#      "MaGi_python Hardware-Embodied Cognitive Architecture Platform, Brendan Malloy, 2025"
+
+# ------------------------------------------------------
+# Contact: https://github.com/bmalloy-224/MaGi_python
+
+
 
 
 import torch
@@ -2400,4 +2432,5 @@ def run_magi_v55(serial_port='COM9', display_video=True):
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
+
     run_magi_v55()
