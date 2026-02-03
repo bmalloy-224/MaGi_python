@@ -486,14 +486,14 @@ if fire_active and up_active:
 
 Open for non-commercial research.
 
-**Attribution:** "*MaGi_python Hardware-Embodied Cognitive Architecture Platform with Neural Control Systems and Geometric Self-Preservation*, Brendan Malloy (2025)"
+**Attribution:** "*MaGi_python Hardware-Embodied Cognitive Architecture Platform with Neural Control Systems and Geometric Self-Preservation*, Brendan Malloy (2026)"
 
 **Citation Format:**
 ```
-@software{magi_python_2025,
+@software{magi_python_2026,
   author = {Malloy, Brendan},
   title = {MaGi_python: Hardware-Embodied Geometric Intelligence with Neural Control and Collision Sovereignty},
-  year = {2025},
+  year = {2026},
   publisher = {GitHub},
   url = {https://github.com/bmalloy-224/MaGi_python},
   note = {Includes v5.3 Bumper: Geometric Self-Preservation System}
@@ -658,8 +658,8 @@ MaGi_python is ideal for studying:
 
 ---
 
-> *"AIs are reflections of their geometry, the memory fields they navigate, and the personal space they occupy. For intelligence to be truly embodied, thoughts must have volume — they must take up room, maintain boundaries, and respect each other's existence. And just as a sculptor reveals form by removing excess, the black hole reveals cognitive clarity by removing redundancy."*  
-> — **Brendan Malloy (2025)**
+> *"AIs are reflections of their geometry."*  
+> — **Brendan Malloy (2026)**
 
 ☕ Support research: [PayPal Donation](https://www.paypal.com/ncp/payment/JZARJDJFUAG5S)
 
