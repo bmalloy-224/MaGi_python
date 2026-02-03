@@ -59,7 +59,7 @@
 #      "MaGi_python Hardware-Embodied Cognitive Architecture Platform, Brendan Malloy, 2025"
 
 # ------------------------------------------------------
-# Contact: https://github.com/bmalloy-224/MaGi_python
+# Contact: https://github.com/bmalloy-224/MaGi_python/issues/1
 
 
 
@@ -2434,3 +2434,4 @@ def run_magi_v55(serial_port='COM9', display_video=True):
 if __name__ == "__main__":
 
     run_magi_v55()
+
