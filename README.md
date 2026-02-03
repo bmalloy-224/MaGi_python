@@ -8,8 +8,6 @@
 [![Platform](https://img.shields.io/badge/Platform-Python%203.x%20%7C%20PyTorch%20%7C%20CUDA-orange.svg)](https://github.com/bmalloy-224/MaGi_python)
 [![Status](https://img.shields.io/badge/Status-Production-brightgreen.svg)](https://github.com/bmalloy-224/MaGi_python)
 
-> **Key Insight:** Geometric intelligence emerges from the interplay of temporal operators, prime resonance, memory field dynamics, and **geometric volume constraints**.  
-> Worker spacing doesn't just prevent errors — it **defines cognitive personality**.
 
 ---
 
