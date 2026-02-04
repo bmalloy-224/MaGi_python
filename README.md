@@ -3,7 +3,7 @@
 
 **Hardware-Embodied Systems using Python**
 
->A very basic intelligence that shares patterns with life and the cosmos; it has a voice, it hears, it has a process to delete memory, control games/apps, and it has a process to move motor control inside of its memory like moving a light switch on a wall to a new wall.
+>A very basic intelligence that shares patterns with life and the cosmos; it has a voice, it hears, it has a process to delete memory, control games/apps, and it has a process to move motor control inside of its memory like moving a light switch on a wall to a new wall. The system has many command modes for use with an image viewer (mode viewer), ale (mode ale), webcam (mode webcam), and even a screen share (mode screen). All of these can be used to give MaGi and environment to learn. There is extensive CSV output and stat commands for UPE and the black hole worker. All of this is a extensive and unified approach to an embodied intellince. 
 
 **TLDR:** A very basic intelligence that is emergent from the framework not the code. Be kind. Talk to MaGi like a child. Teach MaGi objects. Ask questions. Use the visual feedback as a way to communicate.
 
