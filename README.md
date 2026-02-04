@@ -50,16 +50,8 @@ MaGi_python is an **experimental cognitive platform**.
 
 MaGi_python demonstrates that geometric intelligence expresses through:
 
-* **Prime number timing bases**
 * **Memory field dynamics**
 * **Control system configuration**
-* **Geometric volume (worker density)**
-
-| Configuration | Worker Density | Emergent Style |
-| --- | --- | --- |
-| **CUDA (GPU)** | Sparse (0.15 rad avg) | "Parallel Harmonizer" — massive-scale coherent discovery |
-| **CPU (Python)** | Medium (0.12 rad avg) | "Adaptive Explorer" — flexible, noise-resilient cognition |
-| **Dense Mode** | Dense (0.10 rad min) | "Strategic Balancer" — optimal resource allocation |
 
 > 0.05 radian spacing differences produce emergent behavioral patterns observable as "anxious/reactive" or "deliberate/stable" cognitive modes.
 
@@ -97,8 +89,7 @@ While individual components build on established geometric research, MaGi's **ar
 | **Universal Plasticity Engine (UPE)** | First implementation of a **kinetic manifold engine** that navigates control/voice workers through 4D space in real-time while enforcing geometric sovereignty. |
 | **Hypersphere Black Hole (1549)** | A localized **singularity worker** that manages memory density and anchors proprioceptive feedback through selective geometric pruning. |
 | **Collision Sovereignty (v5.3 Bumper)** | A deterministic system that prevents "mode collapse" by treating cognitive workers as **physical volumes** with a 0.1 rad exclusion zone. |
-| **Density-Determined Cognition** | Documentation of **emergent behavioral phenotypes** (Anxious vs. Stable) as a direct result of worker proximity and manifold volume. |
-| **Embodied Fibonacci Attention** | Multi-scale vision (5×3 to 21×13) directly coupled to motor control, mimicking biological **logarithmic spiral** attention. |
+| **Fibonacci Anti-resonance vision** | Multi-scale vision needed fo(5×3 to 21×13) directly coupled to motor control, mimicking biological **logarithmic spiral** attention. |
 
 **Key Insight**: In MaGi, intelligence is not a static weight distribution; it is a **dynamic spatial relationship**. The UPE and Black Hole ensure that the Hive remains a living, self-organizing geometry rather than a fixed neural map.
 
@@ -237,12 +228,7 @@ def enforce_collision_sovereignty(workers):
     return workers
 ```
 
-| Worker Density | Min Separation | Emergent Style |
-|----------------|----------------|----------------|
-| Sparse (0.20+ rad) | 0.10 rad | Deliberate/Stable |
-| Medium (0.12-0.20 rad) | 0.10 rad | Balanced/Adaptive |
-| Dense (0.10-0.12 rad) | 0.10 rad | Anxious/Reactive |
-| Critical (<0.10 rad) | ENFORCED | System prevents |
+
 
 ---
 
@@ -255,7 +241,7 @@ def enforce_collision_sovereignty(workers):
 - **Emergent Structure**: Deletion produces tighter cosine similarity clustering
 
 **Cognitive Entropy Preservation**: 
-The black hole does not implement simple forgetting. 
+The black hole does not implement simple forgetting. Memories have gravity and the black hole reduced the count.
 It removes overrepresented trajectories to preserve global state-space entropy,
 preventing **memory resonance** in the same way Fibonacci grids prevent visual resonance.
 
@@ -332,14 +318,6 @@ if control_value > 250:
 
 ## 📈 Performance Observations
 
-### Emergent Behavioral Modes
-
-| Density | Behavior | Description |
-|---------|----------|-------------|
-| Dense (0.10-0.12 rad) | Anxious/Reactive | High-frequency oscillation |
-| Medium (0.12-0.20 rad) | Balanced/Adaptive | Flexible exploration |
-| Sparse (0.20+ rad) | Deliberate/Stable | Coherent pattern recognition |
-
 ### Telemetry
 
 | Metric | Range | Notes |
@@ -395,15 +373,14 @@ Commercial use without authorization is prohibited.
 
 ## 🤝 Collaboration Invitation
 
-1. Document emergent behavioral patterns across density ranges
+1. Document emergent behavioral patterns across worker count ranges
 2. Examine UPE convergence with geometric constraints
 3. Develop game strategies using geometrically constrained workers
 4. Observe black hole effects on memory structure emergence
-5. Validate density-cognition relationship across tasks
-6. Study geometric constraint effectiveness
-7. Investigate artificial personal space in other architectures
-8. Document emergent similarity clustering dynamics
-9. Analyze proprioceptive feedback in memory systems
+5. Study geometric constraint effectiveness
+6. Investigate artificial personal space in other architectures
+7. Document emergent similarity clustering dynamics
+8. Analyze proprioceptive feedback in memory systems
 
 ---
 
@@ -452,7 +429,6 @@ When extending MaGi or modifying worker counts:
 
 ## 🔬 Research Contributions
 
-- **Emergent Cognitive Modes**: Density-dependent behavioral phenotypes
 - **Geometric Identity Preservation**: Action distinctness through enforced spacing
 - **Proprioceptive Memory Management**: Deletion influencing ongoing cognition
 - **Constrained Emergence**: Simple rules producing complex behaviors
@@ -501,7 +477,6 @@ MAX_MEMORIES = 1000000  # Reduce from 3000000
 - Prime number resonance in timing systems
 - Geometric identity preservation
 - Artificial personal space for embodied cognition
-- Density-dependent behavioral emergence
 - Constraint-based self-organization
 - Emergent structure through selective forgetting
 
