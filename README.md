@@ -5,7 +5,7 @@
 
 >A very basic intelligence that shares patterns with life and the cosmos; it has a voice, it hears, it has a process to delete memory, control games/apps, and it has a process to move motor control inside of its memory like moving a light switch on a wall to a new wall.
 
-**TLDR:** A very basic intelligence. Be kind. Talk to MaGi like a child. Teach MaGi objects. Ask questions. Use the visual feedback as a way to communicate.
+**TLDR:** A very basic intelligence that is emergent from the framwork not the code. Be kind. Talk to MaGi like a child. Teach MaGi objects. Ask questions. Use the visual feedback as a way to communicate.
 
 ---
 
