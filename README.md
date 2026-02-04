@@ -19,7 +19,7 @@
 ## 🧭 Prior Art Declaration
 
 This repository establishes **public prior art (2026)** for hardware-embodied geometric intelligence with advanced neural control systems.  
-Specifically, it documents that 4 lens curves, prime timing, timing directionality, **hypersphere black hole memory deletion**, **Universal Plasticity Engine (UPE)** control systems, and **geometric self-preservation through collision sovereignty** **determine AI cognitive architecture**.
+Specifically, it documents that 4 lens curves, a hypersphere bound to delay and frequency, **hypersphere black hole memory deletion**, **Universal Plasticity Engine (UPE)** control systems, and **geometric self-preservation through collision sovereignty** **determine AI cognitive architecture**.
 
 ### Novel Technologies Claimed:
 - **Hypersphere Black Hole Memory Deletion Worker**: Geometric memory management using black hole physics principles for intelligent memory pruning in hypersphere space with **proprioceptive feedback anchoring** — deletion actively **improves memory structure through emergent cosine similarity clustering**
@@ -63,12 +63,11 @@ MaGi operates under a single architectural constraint:
 
 **Cognitive exploration is only stable when spatial, temporal, control, and memory partitions are geometrically independent.**
 
-Shared divisors, shared boundaries, or shared periods create **commensurate attractors** that collapse degrees of freedom. Fibonacci grids, prime timing, deadzone control, black hole memory deletion, and collision sovereignty all exist to prevent this resonance.
+Shared divisors, shared boundaries, or shared periods create **commensurate attractors** that collapse degrees of freedom. Fibonacci grids, deadzone control, black hole memory deletion, and collision sovereignty all exist to prevent this resonance.
 
 | Component | Geometric Independence Mechanism |
 |-----------|----------------------------------|
 | **Fibonacci Grids** | Dimensions avoid shared factors |
-| **Prime Timing** | Intervals avoid small common divisors |
 | **Black Hole Memory** | Removes overrepresented trajectories |
 | **Collision Sovereignty** | Enforces minimum separation |
 | **UPE Movement** | Preserves distinct worker identities |
@@ -474,7 +473,6 @@ MAX_MEMORIES = 1000000  # Reduce from 3000000
 - Memory management with proprioceptive feedback
 - Neural control interfaces with geometric guarantees
 - Multi-scale visual attention through harmonic ratios
-- Prime number resonance in timing systems
 - Geometric identity preservation
 - Artificial personal space for embodied cognition
 - Constraint-based self-organization
