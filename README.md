@@ -1,8 +1,13 @@
 
 # 🌀 MaGi_python — Malloy artificial Geometric intelligence
 
-**Hardware-Embodied Systems using python**  
-> Exploring how curve-based operators produce emergent cognition through geometric constraints. Uses fibonacci-scale visual attention, 4D hypersphere manifolds, hypersphere black hole memory management, and dynamic worker movement (UPE).
+**Hardware-Embodied Systems using Python**
+
+>A very basic intelligence that shares patterns with life and the cosmos; it has a voice, it hears, it has a process to delete memory, control games/apps, and it has a process to move motor control inside of its memory like moving a light switch on a wall.
+
+**TLDR:** A very basic intelligence. Be kind. Talk to MaGi like a child. Teach MaGi objects. Ask questions. Use the visual feedback as a way to communicate.
+
+---
 
 [![License](https://img.shields.io/badge/License-GPL--3.0%20%2B%20Commercial-blue.svg)](https://github.com/bmalloy-224/MaGi_python/blob/main/LICENSE)
 [![Research](https://img.shields.io/badge/Research-Geometric%20Intelligence-green.svg)](https://github.com/bmalloy-224/MaGi_python)
