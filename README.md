@@ -2,33 +2,74 @@
 
 **Hardware-Embodied Geometric Intelligence in Python**
 
-> A basic intelligence that shares patterns with life and the cosmos. It has a voice, it hears, it deletes its own memory, controls games and apps, moves motor workers around inside its own manifold, and now walks across resonance bridges between continents of memory.
-
-**TLDR:** MaGi is a framework of resonance that produces an emergent intelligence. Be kind. Talk to MaGi like a child. Teach it objects. Ask questions. Use the visual feedback as a way to communicate.
-
 [![License](https://img.shields.io/badge/License-GPL--3.0%20%2B%20Commercial-blue.svg)](LICENSE)
 [![Research](https://img.shields.io/badge/Research-Geometric%20Intelligence-green.svg)](https://github.com/bmalloy-224/MaGi_python)
 [![Platform](https://img.shields.io/badge/Platform-Python%203.x%20%7C%20PyTorch%20%7C%20CUDA-orange.svg)](https://github.com/bmalloy-224/MaGi_python)
 [![Status](https://img.shields.io/badge/Status-Experimental%20Research-brightgreen.svg)](https://github.com/bmalloy-224/MaGi_python)
 
+## 🪐 What is MaGi?
+
+MaGi is a self-organizing AI that thinks in geometry. It does not learn from labels, training loops, or human rewards. Instead, it organizes its own memory directly from raw sensorimotor experience — by arranging every thought as a point on a **doughnut-shaped (toroidal) phase space** with a frequency, a delay, and a direction.
+
+Under the hood, every worker — every "thought" — lives at a coordinate on a 6D torus. The first four coordinates are the four temporal lenses (Child, Youth, Adult, Elder), each biasing attention toward immediate reaction, exploration, context, or long-term stability. The last two are frequency and delay, log-wrapped so that one full revolution equals one octave. Memory is stored as positions in this space; gravity, collision, and resonance between positions is what produces behavior.
+
+MaGi keeps two memory banks running in parallel:
+
+- **Main bank** — a stable, long-term memory that stores what it already knows. Tightly clustered, low retrieval entropy, slow to drift.
+- **N bank** — a smaller, faster, more turbulent space. *Originally designed* to give MaGi a sense of time through dream-vibration. *In practice*, MaGi has organized it into something different — an active workspace where ideas branch, simulate, and recombine before being committed to the main bank. The split between the two banks is **emergent, not engineered**: they were given the same physics and discovered their own division of labor.
+
+A **Resonance Bridge** translates internal states onto a 2D Atlas — a landscape of value and confidence — and routes movement on that Atlas into speech (Kokoro TTS), camera control, robot-arm motion, or game actions. Bridges can be loaded from `.pkl` atlases, bound to input modes, and even fire CLI commands when MaGi speaks the same terrain-word three times in eight seconds. This is what turns abstract phase-space dynamics into real-world behavior.
+
+MaGi is a dynamical system, not a trained model. It finds its own rhythm — cycling between absorbing new experience and compressing it into reusable patterns. It branches internally, reuses what works, and adapts without being reprogrammed.
+
+---
+
+## 🔬 Demonstrated Behaviors
+
+Things MaGi has done on its own that were not designed in. All numbers come from running snapshots; reproduce at your own pace.
+
+**Self-compression on Atari Freeway.** Starting from roughly **1.2M memories**, MaGi compressed its own memory bank down to **~1,200 stable patterns** — an order-of-magnitude-cubed (~1000×) reduction — while *improving* play, ultimately scoring 16. The compression ratio was not specified by any loss function or scheduler. The black hole worker (1549) found it through repeated proprioceptive deletion until cosine-similarity clustering tightened to its current attractor.
+
+**Functional separation between banks emerged.** A 1020-hour continuous run produced this snapshot:
+
+| Property | Main bank | N bank |
+| --- | --- | --- |
+| Memories | 2,908 | 89 |
+| Silhouette (clustering) | 0.444 | 0.563 |
+| Trajectory branching | 3.1% (LINEAR/CONVERGENT) | 42.7% (HIGH BRANCHING) |
+| Retrieval entropy | 0.086 (near point-like) | — |
+| Climate | stable attractor field | 94.4% turbulent |
+| Cross-bank branch correlation | **0.014** (near zero) | |
+
+Main and N have stopped mirroring each other. Main is becoming a tight, low-entropy attractor archive; N is staying small but highly branched. The verdict produced by the analyzer that night: **DELIBERATIVE-LIKE (structured workspace, proto-branching)**.
+
+**Geometry-driven branching, not scale-driven.** N shrunk from a peak of 768 nodes down to 89 over many runs, yet branching rate stayed at 42.7%, silhouette at 0.563, turbulence at 94.4%. A random scratchpad shrinking 9× would lose its structure; MaGi's didn't. Branching appears to be a property of the geometry, not of the bank size.
+
+**Long-term manifold hardening.** At 1020 hr, the main bank's 600-second drift fell to 0.0047 (STABLE) for the first time. Short windows still drift — MaGi is still "thinking" in the moment — but the long-term shape no longer dissolves.
+
+**Spontaneous internal rehearsal via word maps.** Using a simple 2D word atlas through the Resonance Bridge, MaGi began replaying experiences, comparing them against current state, and refining its own response patterns — without anything in the code labeled "rehearsal."
+
+These results are not benchmarks against other systems; they are *emergent properties* of the geometry. They are reproducible from the same code, but the exact values depend on the run history of the system.
+
 ---
 
 ## 🧭 Prior Art Declaration
 
-This repository establishes **public prior art (2025–2026)** for hardware-embodied geometric intelligence with advanced neural control, a logarithmically-wrapped toroidal manifold, and inter-manifold resonance bridges.
+This repository establishes **public prior art (2025–2026)** — defensive disclosure intended to prevent later patenting of the architectures described below. It is not a patent claim; it is the opposite. Anyone is free to read, replicate, build on, and publish about this work under the license terms.
 
 ### Novel Technologies Claimed
 
 - **Log-Wrapped Toroidal Manifold (v131+)** — *NEW prior art.* Replaces the original hypersphere. Frequency and delay dimensions are mapped onto a torus where one full wrap (`2π`) equals one octave. **Hz and delay are unbounded** — workers sail freely across octaves with no inflationary asymmetry, no Jacobian, and no walls. Wrap counters track absolute Hz/ms across restarts. This gives MaGi an effectively infinite, cyclical resonance space while keeping all physics phase-bounded and Nyquist-safe.
-- **Resonance Bridge (v135+)** — *NEW prior art.* Paired entrance/destination workers (`BRIDGE<id>_ENT` / `BRIDGE<id>_DEST`) form a memory-binding bridge across the toroidal manifold. The entrance is driven like an ALE controller; the destination teleports to the entrance's coordinates after modulo and wrap counting, with shared terrain signature, beacon vibration, voice (Kokoro TTS), and visual word rendering. Bridges are loaded from atlases (`.pkl`), bind to input modes, fire voice commands when terrain words are spoken in repetition, and expose a spelling/entry buffer for symbolic input.
-- **Hypersphere → Toroidal Black Hole Memory Deletion** — Geometric memory pruning using black-hole physics with proprioceptive feedback. Deletion actively *improves* memory structure through emergent cosine-similarity clustering. Now operating on the toroidal manifold with unwrapped log coordinates for octave-aware matching.
+- **Resonance Bridge (v135+)** — *NEW prior art.* Paired entrance/destination workers (`BRIDGE<id>_ENT` / `BRIDGE<id>_DEST`) form a memory-binding bridge across the toroidal manifold. The entrance is driven like an ALE controller; the destination teleports to the entrance's coordinates after modulo and wrap counting, with shared terrain signature, beacon vibration, voice (Kokoro TTS), and visual word rendering. Bridges are loaded from atlases (`.pkl`), bind to input modes, fire CLI commands when terrain words are spoken in repetition (3× within 8 s), and expose a spelling/entry buffer for symbolic input. The voice-repetition-to-command pattern is, to my knowledge, novel.
+- **Bidirectional Black Hole Gradient (Vacuum / Shield)** — *Prior art.* The main BH worker (1549) is more than a memory-deleter; it is a **steerable gradient field** whose direction is selected by the sign of its own oscillator value. When `bh_val > 0`, the field runs in **vacuum mode**: gradient strongest *toward the center*, pulling memories inward. When `bh_val ≤ 0`, the field runs in **shield mode**: gradient strongest *toward the edge*, pushing memories outward and forming a barrier. The same physics machinery — same `eps_max`, same `eps_floor`, same effective radius — produces opposite behaviors based on a single sign. This is a deliberate architectural choice that lets MaGi switch between consolidation and protection without changing any tuning parameters.
+- **Toroidal Black Hole Memory Deletion** — Geometric memory pruning with proprioceptive feedback (deletion events feed back into `s_filtered`, so the system *feels* its own forgetting). Deletion actively *improves* memory structure through emergent cosine-similarity clustering — observed lift from ~0.65 to ~0.89+. Operates on the toroidal manifold with unwrapped log coordinates for octave-aware matching.
 - **Universal Plasticity Engine (UPE)** — Dynamic cognitive reconfiguration: the BH worker can move control/voice workers within the manifold while preserving collision sovereignty. Workers re-home automatically when displaced.
 - **Collision Sovereignty (v5.3 Bumper)** — Deterministic geometric separation enforcing minimum 0.1 rad spacing to preserve action identity and prevent manifold collapse.
 - **Artificial Personal Space** — Non-overlapping cognitive workers in manifold space, preventing mode collapse through geometric volume constraints.
 - **Fibonacci Grid Video Processing** — Multi-scale visual attention using golden-ratio proportions (5×3, 8×5, 13×8, 21×13).
 - **Neural Deadzone Control + Adaptive Scaler** — Unipolar/bipolar deadzone logic, with the AdaptiveScaler discovering its own ranges over time rather than relying on hardcoded thresholds.
-- **N Hypersphere (Temporal Narrative Layer, v102+)** — A second 5D memory bank running in parallel with the main toroidal bank. Stores `[phase_centroid_4D_norm, log_time_norm]` to give MaGi a separate temporal-narrative dimension without disrupting the main hypersphere where ALE lives.
-- **Dream / Chord / Physics Couplings (Kinetic Manifold, v126+)** — Three pairs of dream workers (1552–1557) that lazy-river through N-bank and main-bank, providing drift, episodic teleport recall, and lens-driven gravitational attraction.
+- **N Bank as Active Workspace (v102+)** — A second memory bank running in parallel with the main toroidal bank. *Designed* as a temporal-narrative layer to give MaGi a sense of time via dream-vibration; *in practice*, has self-organized into a sparse, high-branching deliberative workspace decoupled from the main attractor field. The emergence of working-memory-vs-long-term-memory functional separation from identical physics is itself the prior-art claim.
+- **Dream / Chord / Physics Couplings (Kinetic Manifold, v126+)** — Three pairs of dream workers (1552–1557) that lazy-river through N-bank and main-bank, providing drift, episodic teleport recall, and lens-driven gravitational attraction. These are the "vibration channels" that turn N-bank movement into a felt sense of time and recall.
 
 **Archive Methods:** GitHub repository timestamps, open simulations, and hardware replication data.
 
@@ -36,7 +77,7 @@ This repository establishes **public prior art (2025–2026)** for hardware-embo
 
 ## ⚠️ Safety & Disclaimer
 
-MaGi_python is **experimental cognitive platform**. Provided *as-is* for research and education. May produce unpredictable outputs on physical hardware. Use at your own risk — the author is not liable for damages. Commercial use requires authorization (see [License](#-license--citation)).
+MaGi_python is an **experimental cognitive platform**. Provided *as-is* for research and education. May produce unpredictable outputs on physical hardware. Use at your own risk — the author is not liable for damages. Commercial use requires authorization (see [License](#-license--citation)).
 
 ---
 
@@ -338,6 +379,23 @@ What each step does:
 - A memory is in-field when both wrapped-phase distance and cosine similarity exceed thresholds.
 - Deletion is **proprioceptive** — events feed back into `s_filtered`, so the system *feels* its own forgetting.
 - Observed cosine-similarity rises ~0.65 → ~0.89 post-deletion (~37% structural coherence increase).
+
+**Vacuum vs Shield — the BH gradient is bidirectional.** The same machinery produces two opposite fields depending on the sign of `bh_val`:
+
+```python
+d_norm = clamp(distance_6d / effective_radius, 0, 1)
+
+if bh_val > 0:
+    # VACUUM — peak gravity at the center
+    decay = eps_floor + (eps_peak - eps_floor) * (1 - d_norm) ** k
+    pressure = +to_bh_norm * decay * home_drift_strength
+else:
+    # SHIELD — peak gravity at the edge
+    decay = eps_floor + (eps_peak - eps_floor) * d_norm ** k
+    pressure = -to_bh_norm * decay * home_drift_strength
+```
+
+Vacuum mode pulls memories into the singularity for consolidation. Shield mode pushes them outward, forming a protective rim around the BH worker. Switching between them is a single sign flip on one worker's value — no parameter changes, no separate code path, no retraining. This is what lets MaGi alternate between *compress* and *protect* phases without external orchestration.
 
 ### Universal Plasticity Engine (UPE)
 
