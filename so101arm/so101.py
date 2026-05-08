@@ -1,15 +1,13 @@
 """
 SO-101 Real Robot Control via UDP
 =================================
-Drop-in replacement for the Genesis simulation script.
-
-Commands (JSON over UDP to 127.0.0.1:5005):
+Commands (JSON over UDP):
   {"mode": "pos", "pos": [x, y, z]}
   {"mode": "pos", "pos": [x, y, z], "wrist_roll": 0.5, "wrist_flex": -0.3}
   {"mode": "gripper", "state": "open"}
   {"mode": "gripper", "state": "close"}
-  {"mode": "stop"}              <- emergency stop
-  {"mode": "reset"}             <- re-enable after cutoff
+  {"mode": "stop"}    <- emergency stop (disables torque)
+  {"mode": "reset"}   <- re-enable after stop/cooldown
 """
 
 import socket
@@ -28,17 +26,17 @@ import ikpy.chain
 try:
     from lerobot.robots.so_follower import SOFollower, SOFollowerRobotConfig
     FollowerClass = SOFollower
-    ConfigClass = SOFollowerRobotConfig
+    ConfigClass   = SOFollowerRobotConfig
 except ImportError:
     try:
         from lerobot.robots.so101_follower import SO101Follower, SO101FollowerConfig
         FollowerClass = SO101Follower
-        ConfigClass = SO101FollowerConfig
+        ConfigClass   = SO101FollowerConfig
     except ImportError:
         try:
             from lerobot.common.robots.so101_follower import SO101Follower, SO101FollowerConfig
             FollowerClass = SO101Follower
-            ConfigClass = SO101FollowerConfig
+            ConfigClass   = SO101FollowerConfig
         except ImportError:
             print("ERROR: Could not import lerobot SO follower classes.")
             sys.exit(1)
@@ -46,23 +44,27 @@ except ImportError:
 # ===========================================================================
 # Configuration
 # ===========================================================================
-ROBOT_PORT = "COM10"
-ROBOT_ID   = None           # matches calibration filename (None → None.json)
+ROBOT_PORT = "/dev/ttyACM4"
+ROBOT_ID   = "so101_arm"
 
-UDP_IP     = "127.0.0.1"
-UDP_PORT   = 5005
+UDP_IP      = "0.0.0.0"
+UDP_PORT    = 5005
 BUFFER_SIZE = 1024
 CONTROL_HZ  = 50
 
-# Workspace scale — MaGi ±0.5m → real arm ~±0.25m
-WORKSPACE_SCALE = 0.5
+# Workspace scale: sim +-1 m -> real arm ~+-0.5 m reach
+WORKSPACE_SCALE = 1.0
 
-# Arm speed limit (degrees per second, 0 = no limit / full servo speed)
+# Arm speed limit in degrees/second (0 = unlimited)
 ARM_SPEED = 100
 
-# Gripper uses 0-100 scale (lerobot percentage, NOT degrees)
-GRIPPER_OPEN  = 100.0
-GRIPPER_CLOSE = 0.0
+# Watchdog: if no command arrives in this many seconds, hold position
+CMD_TIMEOUT = 2.0
+
+# Gripper: mapped from Genesis radian values via URDF limits (-0.174533..1.74533)
+# open=0.5rad → 35.14%,  close=-0.1rad → 3.88%
+GRIPPER_OPEN  = 35.14
+GRIPPER_CLOSE = 3.88
 
 # Load/temp safety
 LOAD_THRESHOLD  = 850
@@ -75,7 +77,10 @@ COOLDOWN_TIME   = 2.0
 JOINT_NAMES = ["shoulder_pan", "shoulder_lift", "elbow_flex",
                "wrist_flex", "wrist_roll", "gripper"]
 
-# Per-motor enable — set False to disable
+# Log IK output angles each cycle (useful for checking workspace limits)
+IK_LOG = False
+
+# Per-motor enable -- set False to skip sending to that motor
 MOTOR_ENABLED = {
     "shoulder_pan":  True,
     "shoulder_lift": True,
@@ -86,33 +91,27 @@ MOTOR_ENABLED = {
 }
 
 # ===========================================================================
-# IK — ikpy numerical solver using actual URDF geometry
+# IK -- ikpy numerical solver using actual URDF geometry
 # ===========================================================================
-#
-# Chain: base_link → shoulder_pan → shoulder_link → shoulder_lift →
-#        upper_arm_link → elbow_flex → lower_arm_link → wrist_flex →
-#        wrist_link → wrist_roll → gripper_link → gripper_frame_joint(fixed) →
-#        gripper_frame_link  (the true end-effector tip)
-#
-# active_links_mask: 7 entries, one per link in the chain.
-# [base, pan, lift, elbow, wflex, wroll, gripper_frame(fixed)]
-# [False, True, True, True, True, True, False]
+# Chain (7 links):
+#   base_link(fixed) -> shoulder_pan -> shoulder_lift -> elbow_flex ->
+#   wrist_flex -> wrist_roll -> gripper_frame(fixed)
+# active_links_mask: [False, True, True, True, True, True, False]
 #
 URDF_PATH = "so101_new_calib.urdf"
 
-# Joint limits from URDF (radians), used to clamp solver output
+# Joint limits from URDF (radians) -- indices match chain links 0..6
 _LIMITS = [
-    None,                    # index 0: base_link (inactive)
-    (-1.91986,  1.91986),   # index 1: shoulder_pan
-    (-1.74533,  1.74533),   # index 2: shoulder_lift
-    (-1.69,     1.69),      # index 3: elbow_flex
-    (-1.65806,  1.65806),   # index 4: wrist_flex
-    (-2.74385,  2.84121),   # index 5: wrist_roll
-    None,                    # index 6: gripper_frame (fixed, always 0)
+    None,                    # 0: base_link (inactive)
+    (-1.91986,  1.91986),   # 1: shoulder_pan
+    (-1.74533,  1.74533),   # 2: shoulder_lift
+    (-1.69,     1.69),      # 3: elbow_flex
+    (-1.65806,  1.65806),   # 4: wrist_flex
+    (-2.74385,  2.84121),   # 5: wrist_roll
+    None,                    # 6: gripper_frame (fixed)
 ]
 
 def _load_chain(urdf_path):
-    """Load the ikpy chain once. Tries the given path and a few fallbacks."""
     candidates = [
         urdf_path,
         "so101/so101_new_calib.urdf",
@@ -125,7 +124,10 @@ def _load_chain(urdf_path):
                 base_elements=["base_link"],
                 active_links_mask=[False, True, True, True, True, True, False],
             )
-            print(f"IK chain loaded from: {p}")
+            if len(chain.links) != len(_LIMITS):
+                print(f"WARNING: URDF chain has {len(chain.links)} links, "
+                      f"expected {len(_LIMITS)}. active_links_mask may be wrong.")
+            print(f"IK chain loaded from: {p}  ({len(chain.links)} links)")
             return chain
     print("ERROR: URDF not found for IK chain. Tried:")
     for p in candidates:
@@ -137,21 +139,12 @@ _chain = _load_chain(URDF_PATH)
 
 def solve_ik(x, y, z, current_obs=None):
     """
-    Cartesian position (metres, already workspace-scaled) →
-    joint angles dict (degrees, ready for lerobot send_action).
+    Cartesian position (metres, already workspace-scaled) ->
+    joint angle dict (degrees) for lerobot send_action, or None on failure.
 
-    current_obs: dict from robot.get_observation(), keys like 'shoulder_pan.pos'
-                 in degrees. Used to seed the solver so it stays on the same
-                 solution branch and avoids elbow-flip discontinuities.
-
-    Solves all 5 arm joints (pan + lift + elbow + wrist_flex + wrist_roll)
-    using the actual URDF geometry — no hand-coded link lengths needed.
+    Seeds from current_obs so the solver stays on the same solution branch
+    and avoids elbow-flip discontinuities.
     """
-    # 4×4 target: position only, no orientation constraint (matches Genesis)
-    target = np.eye(4)
-    target[:3, 3] = [x, y, z]
-
-    # Seed vector: [0, pan, lift, elbow, wflex, wroll, 0] in radians
     seed = np.zeros(7)
     if current_obs is not None:
         seed[1] = math.radians(current_obs.get("shoulder_pan.pos",  0.0))
@@ -160,18 +153,40 @@ def solve_ik(x, y, z, current_obs=None):
         seed[4] = math.radians(current_obs.get("wrist_flex.pos",    0.0))
         seed[5] = math.radians(current_obs.get("wrist_roll.pos",    0.0))
 
-    angles = _chain.inverse_kinematics(
-        target,
-        initial_position=seed,
-        orientation_mode=None,  # position-only
-    )
+    # Clamp seed -- ikpy rejects out-of-bounds initial guesses
+    for i, lim in enumerate(_LIMITS):
+        if lim is not None:
+            seed[i] = max(lim[0], min(lim[1], seed[i]))
 
-    # Clamp to URDF joint limits
+    # Match Genesis: identity orientation at target position.
+    # ikpy accepts a 4x4 frame when orientation_mode is left at default.
+    target_frame = np.eye(4)
+    target_frame[:3, 3] = [x, y, z]
+
+    angles = None
+    try:
+        angles = _chain.inverse_kinematics(target_frame, initial_position=seed)
+    except Exception as e:
+        print(f"IK frame error: {e}")
+
+    if angles is None:
+        print("IK frame failed -- retrying position-only")
+        try:
+            angles = _chain.inverse_kinematics([x, y, z], initial_position=seed)
+        except Exception as e:
+            print(f"IK position-only error: {e}")
+            return None
+
+    if angles is None:
+        print("IK failed to converge -- holding previous target")
+        return None
+
+    # Clamp output to URDF limits
     for i, lim in enumerate(_LIMITS):
         if lim is not None:
             angles[i] = max(lim[0], min(lim[1], angles[i]))
 
-    return {
+    result = {
         "shoulder_pan.pos":  math.degrees(angles[1]),
         "shoulder_lift.pos": math.degrees(angles[2]),
         "elbow_flex.pos":    math.degrees(angles[3]),
@@ -179,94 +194,129 @@ def solve_ik(x, y, z, current_obs=None):
         "wrist_roll.pos":    math.degrees(angles[5]),
     }
 
+    if IK_LOG:
+        print("IK -> " + "  ".join(f"{k.split('.')[0]}={v:+.1f}" for k, v in result.items()))
+
+    return result
+
+
+def _shortest_angle_delta(current_deg, target_deg):
+    """Shortest signed delta for a continuous-rotation joint (wrist_roll)."""
+    delta = (target_deg - current_deg + 180.0) % 360.0 - 180.0
+    return delta
+
 
 # ===========================================================================
-# Print calibration data at startup (for reference / debugging)
+# Calibration display
 # ===========================================================================
 def print_calibration():
-    cal_path = pathlib.Path.home() / ".cache" / "huggingface" / "lerobot" / \
-               "calibration" / "robots" / "so_follower" / f"{ROBOT_ID}.json"
-
+    cal_path = (pathlib.Path.home() / ".cache" / "huggingface" / "lerobot" /
+                "calibration" / "robots" / "so_follower" / f"{ROBOT_ID}.json")
     if not cal_path.exists():
         print(f"Calibration file not found: {cal_path}")
-        return
-
+        return None
     print(f"Calibration: {cal_path}")
     try:
         with open(cal_path) as f:
             cal = json.load(f)
-
-        print(f"  {'JOINT':<18s} {'ID':>3s} {'RANGE_MIN':>10s} {'RANGE_MAX':>10s} {'HOMING':>8s} {'DRIVE':>6s} {'TICKS':>7s}")
-        print(f"  {'─'*18} {'─'*3} {'─'*10} {'─'*10} {'─'*8} {'─'*6} {'─'*7}")
+        print(f"  {'JOINT':<18s} {'ID':>3s} {'RANGE_MIN':>10s} {'RANGE_MAX':>10s} "
+              f"{'HOMING':>8s} {'DRIVE':>6s} {'TICKS':>7s}")
+        print(f"  {'--'*18} {'--'*3} {'--'*10} {'--'*10} {'--'*8} {'--'*6} {'--'*7}")
         for jn in JOINT_NAMES:
             if jn not in cal:
                 print(f"  {jn:<18s} (not in calibration)")
                 continue
-            jc = cal[jn]
-            rmin = jc.get("range_min", "?")
-            rmax = jc.get("range_max", "?")
-            home = jc.get("homing_offset", "?")
-            drv  = jc.get("drive_mode", "?")
-            mid  = jc.get("id", "?")
+            jc    = cal[jn]
+            rmin  = jc.get("range_min", "?")
+            rmax  = jc.get("range_max", "?")
+            home  = jc.get("homing_offset", "?")
+            drv   = jc.get("drive_mode", "?")
+            mid   = jc.get("id", "?")
             ticks = abs(rmax - rmin) if isinstance(rmin, int) and isinstance(rmax, int) else "?"
-            print(f"  {jn:<18s} {str(mid):>3s} {str(rmin):>10s} {str(rmax):>10s} {str(home):>8s} {str(drv):>6s} {str(ticks):>7s}")
+            print(f"  {jn:<18s} {str(mid):>3s} {str(rmin):>10s} {str(rmax):>10s} "
+                  f"{str(home):>8s} {str(drv):>6s} {str(ticks):>7s}")
         print()
+        return cal
     except Exception as e:
         print(f"Error reading calibration: {e}\n")
+        return None
+    return cal
+
+
+def _gripper_limits_from_cal(cal):
+    """
+    Determine gripper open/close values to send via send_action.
+
+    lerobot with use_degrees=True maps raw ticks through calibration into
+    a 0-100 percentage space.  Current values match Genesis:
+        Genesis open  =  0.5 rad → 35.14% (via URDF limits -0.174533..1.74533)
+        Genesis close = -0.1 rad →  3.88%
+
+    If gripper direction is reversed on your unit, swap GRIPPER_OPEN/CLOSE.
+    """
+    if cal and "gripper" in cal:
+        g = cal["gripper"]
+        rmin = g.get("range_min", "?")
+        rmax = g.get("range_max", "?")
+        print(f"Gripper cal: range_min={rmin}  range_max={rmax}  ticks span="
+              f"{abs(rmax-rmin) if isinstance(rmin,int) else '?'}")
+        print(f"Gripper sending: open={GRIPPER_OPEN}  close={GRIPPER_CLOSE}  "
+              f"(0-100 pct scale — change if gripper barely moves or slams)")
+    return GRIPPER_OPEN, GRIPPER_CLOSE
 
 
 # ===========================================================================
-# Load monitor
+# Load / temp safety monitor
 # ===========================================================================
 class LoadMonitor:
     def __init__(self, threshold, time_limit, cooldown):
-        self.threshold = threshold
-        self.time_limit = time_limit
-        self.cooldown = cooldown
+        self.threshold      = threshold
+        self.time_limit     = time_limit
+        self.cooldown       = cooldown
         self.overload_start = {}
-        self.paused = False
-        self.pause_start = 0.0
-        self._last_warn = {}
+        self.paused         = False
+        self.pause_start    = 0.0
+        self._last_warn     = {}
 
     def update(self, load_dict):
-        now = time.time()
+        now = time.perf_counter()
         for jn, raw in load_dict.items():
             mag = abs(raw) if isinstance(raw, (int, float)) else 0
             if mag >= self.threshold:
                 if jn not in self.overload_start:
                     self.overload_start[jn] = now
-                    print(f"⚠️  {jn} load={mag}")
+                    print(f"Warning: {jn} load={mag}")
                 elif now - self.overload_start[jn] >= self.time_limit:
-                    print(f"⏸️  {jn} overloaded (load={mag}) for {self.time_limit}s — pausing {self.cooldown}s")
-                    self.paused = True
+                    print(f"Pause: {jn} overload={mag} for {self.time_limit}s -> cooldown {self.cooldown}s")
+                    self.paused      = True
                     self.pause_start = now
                     return
             else:
                 self.overload_start.pop(jn, None)
 
     def check_temp(self, temp_dict):
-        now = time.time()
+        now = time.perf_counter()
         for jn, temp in temp_dict.items():
             if not isinstance(temp, (int, float)):
                 continue
             if temp >= TEMP_PAUSE:
-                print(f"⏸️  {jn} temp={temp}°C — pausing {self.cooldown}s")
-                self.paused = True
+                print(f"Pause: {jn} temp={temp}C -> cooldown {self.cooldown}s")
+                self.paused      = True
                 self.pause_start = now
                 return
             elif temp >= TEMP_WARN:
                 last = self._last_warn.get(jn, 0)
                 if now - last > 10.0:
-                    print(f"🌡️  {jn} temp={temp}°C")
+                    print(f"Warn: {jn} temp={temp}C")
                     self._last_warn[jn] = now
 
     def check_cooldown(self):
         if not self.paused:
             return True
-        if time.time() - self.pause_start >= self.cooldown:
+        if time.perf_counter() - self.pause_start >= self.cooldown:
             self.paused = False
             self.overload_start.clear()
-            print(f"▶️  Cooldown complete — resuming")
+            print("Cooldown complete -- resuming")
             return True
         return False
 
@@ -274,64 +324,107 @@ class LoadMonitor:
         self.paused = False
         self.overload_start.clear()
         self._last_warn.clear()
-        print("✅ Safety monitor reset")
+        print("Safety monitor reset")
 
 
 # ===========================================================================
-# UDP listener
+# UDP listener  (thread-safe via lock + atomic pop methods)
 # ===========================================================================
 class UDPServer:
     def __init__(self, ip, port):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((ip, port))
         self.sock.setblocking(False)
-        self.latest_pos_cmd     = None
-        self.latest_gripper_cmd = None
-        self.latest_wrist_cmd   = None
-        self.request_stop       = False
-        self.request_reset      = False
-        self.running = True
+
+        self._lock        = threading.Lock()
+        self._pos_cmd     = None   # [x, y, z]
+        self._gripper_cmd = None   # "open" | "close"
+        self._wrist_cmd   = None   # (roll_rad|None, flex_rad|None)
+        self._stop        = False
+        self._reset       = False
+        self.running      = True
+
+    # --- atomic getters (check-and-clear in one lock) ---
+
+    def pop_pos(self):
+        with self._lock:
+            v, self._pos_cmd = self._pos_cmd, None
+            return v
+
+    def pop_gripper(self):
+        with self._lock:
+            v, self._gripper_cmd = self._gripper_cmd, None
+            return v
+
+    def pop_wrist(self):
+        with self._lock:
+            v, self._wrist_cmd = self._wrist_cmd, None
+            return v
+
+    def pop_stop(self):
+        with self._lock:
+            v, self._stop = self._stop, False
+            return v
+
+    def pop_reset(self):
+        with self._lock:
+            v, self._reset = self._reset, False
+            return v
+
+    # --- listener thread ---
 
     def listen(self):
         while self.running:
             try:
                 data, _ = self.sock.recvfrom(BUFFER_SIZE)
                 try:
-                    cmd = json.loads(data.decode())
-
-                    if cmd.get("mode") == "pos" and "pos" in cmd:
-                        pos = cmd["pos"]
-                        if len(pos) >= 3:
-                            self.latest_pos_cmd = [float(pos[0]), float(pos[1]), float(pos[2])]
-                        # Wrist overrides — wrist joints are now solved by IK,
-                        # but explicit overrides from the client still take priority.
-                        wrist_roll = cmd.get("wrist_roll", cmd.get("wrist_rot", None))
-                        wrist_flex = cmd.get("wrist_flex", cmd.get("wrist_tilt", None))
-                        if wrist_roll is not None or wrist_flex is not None:
-                            self.latest_wrist_cmd = (
-                                float(wrist_roll) if wrist_roll is not None else None,
-                                float(wrist_flex) if wrist_flex is not None else None,
-                            )
-
-                    elif cmd.get("mode") == "gripper" and "state" in cmd:
-                        state = cmd["state"].lower()
-                        if state in ("open", "close"):
-                            self.latest_gripper_cmd = state
-                            print(f"Gripper command: {state}")
-
-                    elif cmd.get("mode") == "stop":
-                        self.request_stop = True
-                        print("🛑 Stop command received")
-
-                    elif cmd.get("mode") == "reset":
-                        self.request_reset = True
-                        print("Reset command received")
-
-                except (json.JSONDecodeError, KeyError, ValueError) as e:
+                    cmd = json.loads(data.decode("utf-8"))
+                    self._handle(cmd)
+                except (json.JSONDecodeError, KeyError, ValueError,
+                        UnicodeDecodeError) as e:
                     print(f"Invalid command: {e}")
             except BlockingIOError:
                 pass
             time.sleep(0.001)
+
+    def _handle(self, cmd):
+        mode = cmd.get("mode")
+
+        if mode == "pos" and "pos" in cmd:
+            pos = cmd["pos"]
+            if len(pos) == 3:
+                x, y, z = float(pos[0]), float(pos[1]), float(pos[2])
+                if not all(math.isfinite(v) for v in (x, y, z)):
+                    print(f"Rejected pos command: non-finite values {pos}")
+                    return
+                with self._lock:
+                    self._pos_cmd = [x, y, z]
+            roll = cmd.get("wrist_roll", cmd.get("wrist_rot"))
+            flex = cmd.get("wrist_flex", cmd.get("wrist_tilt"))
+            if roll is not None or flex is not None:
+                with self._lock:
+                    self._wrist_cmd = (
+                        float(roll) if roll is not None else None,
+                        float(flex) if flex is not None else None,
+                    )
+
+        elif mode == "gripper" and "state" in cmd:
+            state = cmd["state"].lower()
+            if state in ("open", "close"):
+                with self._lock:
+                    self._gripper_cmd = state
+                print(f"Gripper: {state}")
+
+        elif mode == "stop":
+            with self._lock:
+                self._stop = True
+            print("STOP command received")
+
+        elif mode == "reset":
+            with self._lock:
+                self._reset = True
+            print("RESET command received")
 
     def stop(self):
         self.running = False
@@ -339,10 +432,11 @@ class UDPServer:
 
 
 # ===========================================================================
-# Main
+# Main loop
 # ===========================================================================
 def main():
-    print_calibration()
+    cal = print_calibration()
+    g_open, g_close = _gripper_limits_from_cal(cal)
 
     print(f"Connecting to SO-101 on {ROBOT_PORT} ...")
     config = ConfigClass(port=ROBOT_PORT, id=ROBOT_ID, use_degrees=True)
@@ -359,7 +453,6 @@ def main():
         sys.exit(1)
     print("SO-101 connected!")
 
-    # Disable torque on disabled motors
     enabled  = [jn for jn in JOINT_NAMES if MOTOR_ENABLED.get(jn, True)]
     disabled = [jn for jn in JOINT_NAMES if not MOTOR_ENABLED.get(jn, True)]
     if disabled:
@@ -371,58 +464,62 @@ def main():
                 pass
     print(f"Motors ENABLED:  {', '.join(enabled)}")
 
-    # Read initial positions
-    obs = robot.get_observation()
+    obs    = robot.get_observation()
     target = {f"{jn}.pos": obs.get(f"{jn}.pos", 0.0) for jn in JOINT_NAMES}
-    print(f"Initial positions: {target}")
-    print(f"Gripper: open={GRIPPER_OPEN} close={GRIPPER_CLOSE} (0-100 scale)")
+    print(f"Initial positions: { {k: round(v, 1) for k, v in target.items()} }")
+    print(f"Gripper: open={GRIPPER_OPEN}  close={GRIPPER_CLOSE}  (Genesis-mapped %)")
 
     monitor = LoadMonitor(LOAD_THRESHOLD, LOAD_TIME_LIMIT, COOLDOWN_TIME)
 
     udp = UDPServer(UDP_IP, UDP_PORT)
     threading.Thread(target=udp.listen, daemon=True).start()
-    print(f"\nUDP listening on {UDP_IP}:{UDP_PORT}")
-    print(f"Safety: load>{LOAD_THRESHOLD} for {LOAD_TIME_LIMIT}s → {COOLDOWN_TIME}s cooldown")
-    print(f"        temp warn>{TEMP_WARN}°C, pause>{TEMP_PAUSE}°C → {COOLDOWN_TIME}s cooldown")
-    print(f"Workspace scale: {WORKSPACE_SCALE}")
-    speed_str = f"{ARM_SPEED}°/s ({ARM_SPEED/CONTROL_HZ:.1f}°/cycle)" if ARM_SPEED > 0 else "unlimited"
-    print(f"Arm speed: {speed_str}")
-    print("IK: ikpy numerical solver, seeded from current pose (no branch-flipping)")
+
+    print(f"\nUDP on {UDP_IP}:{UDP_PORT}")
+    print(f"Safety: load>{LOAD_THRESHOLD} for {LOAD_TIME_LIMIT}s -> {COOLDOWN_TIME}s cooldown  "
+          f"| temp warn>{TEMP_WARN}C  pause>{TEMP_PAUSE}C")
+    speed_str = (f"{ARM_SPEED}deg/s ({ARM_SPEED/CONTROL_HZ:.1f}deg/cycle)"
+                 if ARM_SPEED > 0 else "unlimited")
+    print(f"Speed: {speed_str}  |  Workspace scale: {WORKSPACE_SCALE}  |  Watchdog: {CMD_TIMEOUT}s")
+    print("IK: ikpy numerical (URDF geometry, seeded from current pose)")
     print("Ctrl+C to quit.\n")
 
-    loop_dt = 1.0 / CONTROL_HZ
-    load_interval = 1.0 / LOAD_CHECK_HZ
-    last_load_check = 0.0
+    loop_dt           = 1.0 / CONTROL_HZ
+    load_interval     = 1.0 / LOAD_CHECK_HZ
+    last_load_check   = 0.0
+    last_cmd_time     = time.perf_counter()
     emergency_stopped = False
-    next_tick = time.perf_counter()
+    next_tick         = time.perf_counter()
 
     try:
         while True:
 
-            # ---- Emergency stop ----
-            if udp.request_stop:
+            # ----------------------------------------------------------------
+            # Emergency stop
+            # ----------------------------------------------------------------
+            if udp.pop_stop():
                 if not emergency_stopped:
-                    print("🛑 Emergency stop (send 'reset' to recover)")
+                    print("Emergency stop -- disabling torque  (send 'reset' to recover)")
                     try:
                         robot.bus.disable_torque()
-                    except Exception:
-                        pass
-                    emergency_stopped = True
-                udp.request_stop = False
+                        emergency_stopped = True
+                    except Exception as e:
+                        print(f"Failed to disable torque: {e}")
 
-            # ---- Manual reset ----
-            if udp.request_reset:
+            # ----------------------------------------------------------------
+            # Manual reset
+            # ----------------------------------------------------------------
+            if udp.pop_reset():
                 if emergency_stopped:
-                    print("✅ Re-enabling torque")
+                    print("Re-enabling torque")
                     try:
                         robot.bus.enable_torque()
-                    except Exception:
-                        pass
-                    emergency_stopped = False
+                        emergency_stopped = False
+                    except Exception as e:
+                        print(f"Failed to enable torque: {e}")
                 monitor.reset()
-                obs = robot.get_observation()
+                obs    = robot.get_observation()
                 target = {f"{jn}.pos": obs.get(f"{jn}.pos", 0.0) for jn in JOINT_NAMES}
-                udp.request_reset = False
+                last_cmd_time = time.perf_counter()
 
             if emergency_stopped:
                 next_tick += loop_dt
@@ -431,18 +528,18 @@ def main():
                     time.sleep(sleep_t)
                 continue
 
-            # ---- Load & temp monitoring ----
-            now_time = time.time()
-            if now_time - last_load_check >= load_interval:
-                last_load_check = now_time
+            # ----------------------------------------------------------------
+            # Load & temp monitoring (throttled)
+            # ----------------------------------------------------------------
+            now_pc = time.perf_counter()
+            if now_pc - last_load_check >= load_interval:
+                last_load_check = now_pc
                 try:
-                    loads = robot.bus.sync_read("Present_Load")
-                    monitor.update(loads)
+                    monitor.update(robot.bus.sync_read("Present_Load"))
                 except Exception:
                     pass
                 try:
-                    temps = robot.bus.sync_read("Present_Temperature")
-                    monitor.check_temp(temps)
+                    monitor.check_temp(robot.bus.sync_read("Present_Temperature"))
                 except Exception:
                     pass
 
@@ -453,62 +550,94 @@ def main():
                     if sleep_t > 0:
                         time.sleep(sleep_t)
                     continue
-                else:
-                    obs = robot.get_observation()
-                    target = {f"{jn}.pos": obs.get(f"{jn}.pos", 0.0) for jn in JOINT_NAMES}
+                # Resumed -- resync target to actual position
+                obs    = robot.get_observation()
+                target = {f"{jn}.pos": obs.get(f"{jn}.pos", 0.0) for jn in JOINT_NAMES}
 
-            # ============================================================
-            # Command processing
-            # ============================================================
-
-            # 1. Position → scale → IK (all 5 arm joints, seeded from current pose)
-            if udp.latest_pos_cmd is not None:
-                pos = udp.latest_pos_cmd
+            # ----------------------------------------------------------------
+            # Single observation read per cycle (IK seed + speed limit)
+            # ----------------------------------------------------------------
+            try:
                 obs = robot.get_observation()
+            except Exception as e:
+                print(f"get_observation failed: {e} -- skipping cycle")
+                next_tick += loop_dt
+                sleep_t = next_tick - time.perf_counter()
+                if sleep_t > 0:
+                    time.sleep(sleep_t)
+                continue
+
+            # ----------------------------------------------------------------
+            # Command processing
+            # ----------------------------------------------------------------
+            got_cmd = False
+
+            # 1. Position -> IK (all 5 arm joints, seeded from current obs)
+            pos_cmd = udp.pop_pos()
+            if pos_cmd is not None:
                 ik = solve_ik(
-                    pos[0] * WORKSPACE_SCALE,
-                    pos[1] * WORKSPACE_SCALE,
-                    pos[2] * WORKSPACE_SCALE,
-                    current_obs=obs,    # seed prevents elbow-flip branch switching
+                    pos_cmd[0] * WORKSPACE_SCALE,
+                    pos_cmd[1] * WORKSPACE_SCALE,
+                    pos_cmd[2] * WORKSPACE_SCALE,
+                    current_obs=obs,
                 )
-                target.update(ik)
-                udp.latest_pos_cmd = None
+                if ik is not None:
+                    target.update(ik)
+                got_cmd = True
 
-            # 2. Gripper (0-100 scale: 0=closed, 100=open)
-            if udp.latest_gripper_cmd is not None:
-                if udp.latest_gripper_cmd == "open":
-                    target["gripper.pos"] = GRIPPER_OPEN
-                else:
-                    target["gripper.pos"] = GRIPPER_CLOSE
-                udp.latest_gripper_cmd = None
+            # 2. Gripper (0-100 scale)
+            grip_cmd = udp.pop_gripper()
+            if grip_cmd is not None:
+                target["gripper.pos"] = g_open if grip_cmd == "open" else g_close
+                got_cmd = True
 
-            # 3. Explicit wrist overrides (radians from sender → degrees for lerobot).
-            #    These override whatever IK computed for wrist joints, same as before.
-            if udp.latest_wrist_cmd is not None:
-                roll_rad, flex_rad = udp.latest_wrist_cmd
-                if roll_rad is not None:
-                    target["wrist_roll.pos"] = math.degrees(roll_rad)
-                if flex_rad is not None:
-                    target["wrist_flex.pos"] = math.degrees(flex_rad)
-                udp.latest_wrist_cmd = None
+            # 3. Explicit wrist overrides (radians -> degrees, override IK result)
+            wrist_cmd = udp.pop_wrist()
+            if wrist_cmd is not None:
+                roll_rad, flex_rad = wrist_cmd
+                # Match Genesis: missing wrist joint is forced to 0.0, not preserved
+                target["wrist_roll.pos"] = math.degrees(roll_rad) if roll_rad is not None else 0.0
+                target["wrist_flex.pos"] = math.degrees(flex_rad) if flex_rad is not None else 0.0
+                got_cmd = True
 
-            # 4. Send — only enabled motors, with speed limiting
+            if got_cmd:
+                last_cmd_time = time.perf_counter()
+            elif CMD_TIMEOUT > 0 and (time.perf_counter() - last_cmd_time) > CMD_TIMEOUT:
+                pass  # watchdog: arm holds last target naturally
+
+            # ----------------------------------------------------------------
+            # Speed limiting + send
+            # ----------------------------------------------------------------
             action = {k: v for k, v in target.items()
                       if MOTOR_ENABLED.get(k.replace(".pos", ""), True)}
 
             if ARM_SPEED > 0:
-                max_step = ARM_SPEED / CONTROL_HZ  # degrees per cycle
-                obs = robot.get_observation()
-                for key in action:
-                    current = obs.get(key, action[key])
-                    goal    = action[key]
-                    delta   = goal - current
-                    if abs(delta) > max_step:
-                        action[key] = current + max_step * (1.0 if delta > 0 else -1.0)
+                max_step = ARM_SPEED / CONTROL_HZ
+                for key in list(action.keys()):
+                    current = obs.get(key)
+                    if current is None:
+                        print(f"Warning: observation missing {key}")
+                        continue
+                    if key == "wrist_roll.pos":
+                        # Continuous rotation joint — take shortest angular path
+                        delta = _shortest_angle_delta(current, action[key])
+                        if abs(delta) > max_step:
+                            action[key] = current + math.copysign(max_step, delta)
+                        else:
+                            action[key] = current + delta
+                    else:
+                        delta = action[key] - current
+                        if abs(delta) > max_step:
+                            action[key] = current + math.copysign(max_step, delta)
 
-            robot.send_action(action)
+            try:
+                robot.send_action(action)
+            except Exception as e:
+                print(f"send_action failed: {e}")
 
-            # ---- Rate control ----
+            # ----------------------------------------------------------------
+            # Rate control (phase-locked)
+            # ----------------------------------------------------------------
             next_tick += loop_dt
             sleep_t = next_tick - time.perf_counter()
             if sleep_t > 0:
